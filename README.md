@@ -27,18 +27,26 @@ pip install cryptography paramiko oracledb
 
 ## 1.1 Database Configuration Options
 
-By default, the script connects to your local seeded **Oracle** container database. You can customize the behavior by setting environment variables before running `run_etl.py`:
+By default, the script connects to your local seeded **Oracle** container database. You can customize the behavior by creating a `.env` file in the `ve_etl_demo` folder or setting environment variables before running `run_etl.py`:
 
-*   **`DB_TYPE`**: Connection mode. Set to `"oracle"` (default) or `"sqlite"`.
+*   **`DB_TYPE`**: Connection mode. Set to `"oracle"` (local Oracle, default), `"dev_oracle"` (remote Dev environment database), or `"sqlite"`.
 *   **`ETL_DB_FILE`**: Path to SQLite database (default: `local_data.db`, used if `DB_TYPE="sqlite"`).
 
-### Oracle Environment Credentials
-If you are running the database locally, the default values below match the seeded developer stack:
+### Local Oracle Connection Configs (DB_TYPE = "oracle")
+If you are running the database locally, the default values below match the seeded developer container:
 *   `ORACLE_USER` (default: `"ve_etl_user"`)
 *   `ORACLE_PASSWORD` (default: `"Etl_Pass1"`)
 *   `ORACLE_HOST` (default: `"localhost"`)
 *   `ORACLE_PORT` (default: `"1521"`)
 *   `ORACLE_SERVICE` (default: `"FREEPDB1"`)
+
+### Dev Environment Oracle Connection Configs (DB_TYPE = "dev_oracle")
+Configure these to connect to your shared remote Dev Oracle database:
+*   `DEV_ORACLE_USER` (default: `"ve_etl_user"`)
+*   `DEV_ORACLE_PASSWORD` (default: `"Etl_Pass1"`)
+*   `DEV_ORACLE_HOST` (default: `"dev-db-server.yourdomain.com"`)
+*   `DEV_ORACLE_PORT` (default: `"1521"`)
+*   `DEV_ORACLE_SERVICE` (default: `"DEV_VITAL_EVENTS"`)
 
 ---
 
