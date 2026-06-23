@@ -1,0 +1,21 @@
+# Gitignore for Standalone ETL Demo
+
+# Database files
+local_data.db
+
+# Cryptographic Keys (Keep private keys private!)
+*.pem
+*.key
+
+# Data payloads and extracts
+extract_data.csv
+extract_data.csv.enc
+decrypted_data.csv
+
+# Python caches
+__pycache__/
+*.pyc
+
+# IDE configs
+.idea/
+.vscode/
