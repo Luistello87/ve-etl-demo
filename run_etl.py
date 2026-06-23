@@ -9,10 +9,18 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 import paramiko
 
 # Configurations (can be overridden via environment variables)
-DB_FILE = os.getenv("ETL_DB_FILE", "local_data.db")
+DB_TYPE = os.getenv("DB_TYPE", "oracle") # "oracle" or "sqlite"
+DB_FILE = os.getenv("ETL_DB_FILE", "local_data.db") # used if DB_TYPE is "sqlite"
 PUBLIC_KEY_FILE = os.getenv("ETL_PUBLIC_KEY", "public_key.pem")
 OUTPUT_CSV = "extract_data.csv"
 ENCRYPTED_FILE = "extract_data.csv.enc"
+
+# Oracle Connection Configs
+ORACLE_USER = os.getenv("ORACLE_USER", "ve_etl_user")
+ORACLE_PASSWORD = os.getenv("ORACLE_PASSWORD", "Etl_Pass1")
+ORACLE_HOST = os.getenv("ORACLE_HOST", "localhost")
+ORACLE_PORT = os.getenv("ORACLE_PORT", "1521")
+ORACLE_SERVICE = os.getenv("ORACLE_SERVICE", "FREEPDB1")
 
 # SFTP configurations (configure these for laptop-to-laptop)
 SFTP_HOST = os.getenv("SFTP_HOST", "localhost")
@@ -37,21 +45,47 @@ def transform_row(row):
     return new_row
 
 def extract_and_transform():
-    print("Step 1: Connecting to Database and extracting active records...")
-    if not os.path.exists(DB_FILE):
-        raise FileNotFoundError(f"Database file not found: {DB_FILE}. Please run setup_db.py first.")
+    db_mode = DB_TYPE.lower()
+    
+    if db_mode == "oracle":
+        print(f"Step 1: Connecting to Oracle Database ({ORACLE_HOST}:{ORACLE_PORT}/{ORACLE_SERVICE}) and extracting records...")
+        try:
+            import oracledb
+        except ImportError:
+            raise ImportError(
+                "The 'oracledb' package is required to connect to Oracle. "
+                "Please run: pip install oracledb"
+            )
+            
+        dsn = oracledb.makedsn(ORACLE_HOST, ORACLE_PORT, service_name=ORACLE_SERVICE)
+        conn = oracledb.connect(user=ORACLE_USER, password=ORACLE_PASSWORD, dsn=dsn)
+        cursor = conn.cursor()
         
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-    
-    # Extract only ACTIVE death records
-    cursor.execute("""
-        SELECT first_name, last_name, gender, address, city, province, death_date 
-        FROM vital_events 
-        WHERE status = 'ACTIVE'
-    """)
-    rows = cursor.fetchall()
-    
+        # Extract from the seeded production table
+        cursor.execute("""
+            SELECT first_name, last_name, gender, address, city, province, death_date 
+            FROM vital_events_death
+        """)
+        rows = cursor.fetchall()
+        
+    elif db_mode == "sqlite":
+        print(f"Step 1: Connecting to SQLite Database ({DB_FILE}) and extracting active records...")
+        if not os.path.exists(DB_FILE):
+            raise FileNotFoundError(f"Database file not found: {DB_FILE}. Please run setup_db.py first.")
+            
+        conn = sqlite3.connect(DB_FILE)
+        cursor = conn.cursor()
+        
+        # Extract only ACTIVE death records
+        cursor.execute("""
+            SELECT first_name, last_name, gender, address, city, province, death_date 
+            FROM vital_events 
+            WHERE status = 'ACTIVE'
+        """)
+        rows = cursor.fetchall()
+    else:
+        raise ValueError(f"Unsupported DB_TYPE: {DB_TYPE}. Choose 'oracle' or 'sqlite'.")
+
     print(f" - Extracted {len(rows)} records. Processing transformations...")
     
     # Write to local CSV

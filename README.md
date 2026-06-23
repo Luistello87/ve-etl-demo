@@ -20,8 +20,25 @@ This repository demonstrates the core logic of the Vital Events ETL engine in a 
 Install the required Python packages on both laptops:
 
 ```bash
-pip install cryptography paramiko
+pip install cryptography paramiko oracledb
 ```
+
+---
+
+## 1.1 Database Configuration Options
+
+By default, the script connects to your local seeded **Oracle** container database. You can customize the behavior by setting environment variables before running `run_etl.py`:
+
+*   **`DB_TYPE`**: Connection mode. Set to `"oracle"` (default) or `"sqlite"`.
+*   **`ETL_DB_FILE`**: Path to SQLite database (default: `local_data.db`, used if `DB_TYPE="sqlite"`).
+
+### Oracle Environment Credentials
+If you are running the database locally, the default values below match the seeded developer stack:
+*   `ORACLE_USER` (default: `"ve_etl_user"`)
+*   `ORACLE_PASSWORD` (default: `"Etl_Pass1"`)
+*   `ORACLE_HOST` (default: `"localhost"`)
+*   `ORACLE_PORT` (default: `"1521"`)
+*   `ORACLE_SERVICE` (default: `"FREEPDB1"`)
 
 ---
 
