@@ -60,7 +60,7 @@ def decrypt_payload():
     with open(DECRYPTED_CSV, "wb") as f:
         f.write(decrypted_bytes)
         
-    print(f"🎉 Decryption Successful! File recovered at: {DECRYPTED_CSV}")
+    print(f"[SUCCESS] Decryption Successful! File recovered at: {DECRYPTED_CSV}")
     print("Sample Output Content:")
     print("-" * 50)
     print(decrypted_bytes.decode("utf-8")[:500])  # Print first 500 chars
@@ -70,4 +70,4 @@ if __name__ == "__main__":
     try:
         decrypt_payload()
     except Exception as e:
-        print(f"❌ Decryption Failed: {e}")
+        print(f"[ERROR] Decryption Failed: {e}")

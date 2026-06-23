@@ -138,7 +138,7 @@ def upload_via_sftp():
         sftp.close()
         print(" - SFTP Transfer Completed successfully!")
     except Exception as e:
-        print(f" ❌ SFTP Upload Failed: {e}")
+        print(f" [ERROR] SFTP Upload Failed: {e}")
         print("   (Ensure your destination SFTP configuration and host firewall are set up correctly)")
     finally:
         ssh.close()
@@ -148,9 +148,9 @@ def main():
         extract_and_transform()
         encrypt_file()
         upload_via_sftp()
-        print("\n🎉 ETL process complete!")
+        print("\n[SUCCESS] ETL process complete!")
     except Exception as e:
-        print(f"\n❌ Error during ETL execution: {e}")
+        print(f"\n[ERROR] Error during ETL execution: {e}")
 
 if __name__ == "__main__":
     main()
