@@ -1,0 +1,11 @@
+.git
+.gitignore
+.dockerignore
+local_data.db
+*.pem
+*.csv
+*.enc
+.env
+.idea/
+.vscode/
+__pycache__/

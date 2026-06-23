@@ -5,26 +5,39 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
+# Path search order (checks current directory first, then include/ subdirectory)
 ENCRYPTED_FILE = "extract_data.csv.enc"
 PRIVATE_KEY_FILE = "private_key.pem"
 DECRYPTED_CSV = "decrypted_data.csv"
 
+def find_file(filename):
+    """Checks current directory, then include/ subdirectory."""
+    if os.path.exists(filename):
+        return filename
+    include_path = os.path.join("include", filename)
+    if os.path.exists(include_path):
+        return include_path
+    return filename
+
 def decrypt_payload():
     print("Step 1: Reading encrypted payload and private key...")
-    if not os.path.exists(ENCRYPTED_FILE):
-        raise FileNotFoundError(f"Encrypted file not found: {ENCRYPTED_FILE}")
-    if not os.path.exists(PRIVATE_KEY_FILE):
-        raise FileNotFoundError(f"Private key file not found: {PRIVATE_KEY_FILE}")
+    encrypted_path = find_file(ENCRYPTED_FILE)
+    private_key_path = find_file(PRIVATE_KEY_FILE)
+    
+    if not os.path.exists(encrypted_path):
+        raise FileNotFoundError(f"Encrypted file not found: {encrypted_path} (checked current dir and include/)")
+    if not os.path.exists(private_key_path):
+        raise FileNotFoundError(f"Private key file not found: {private_key_path} (checked current dir and include/)")
         
     # 1. Load RSA Private Key
-    with open(PRIVATE_KEY_FILE, "rb") as f:
+    with open(private_key_path, "rb") as f:
         private_key = serialization.load_pem_private_key(
             f.read(),
             password=None
         )
         
     # 2. Parse the packed binary payload
-    with open(ENCRYPTED_FILE, "rb") as f:
+    with open(encrypted_path, "rb") as f:
         # Read the 4-byte key length
         key_len_bytes = f.read(4)
         if len(key_len_bytes) < 4:

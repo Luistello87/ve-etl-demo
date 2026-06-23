@@ -1,0 +1,4 @@
+cryptography
+paramiko
+apache-airflow-providers-oracle
+apache-airflow-providers-sftp
